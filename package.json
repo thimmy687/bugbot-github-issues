@@ -1,6 +1,6 @@
 {
   "name": "bugbot-github-issues",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A very simple client for Github Issues",
   "main": "dist/index",
   "scripts": {
