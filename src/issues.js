@@ -4,7 +4,7 @@ function issues(token, repoID, callback) {
   let uri = `https://api.github.com/repos/${repoID}/issues`
   let json = true
   let headers = {
-    'User-Agent': 'brianleroux', 
+    'User-Agent': 'Bugbot', 
     'Authorization': `token ${token}`
   }
   request.get({uri, headers, json}, (err, res)=> {

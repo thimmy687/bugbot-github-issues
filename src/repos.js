@@ -6,7 +6,7 @@ let json = true
 
 function head(token) {
   let headers = {
-    'User-Agent': 'brianleroux',
+    'User-Agent': 'Bugbot',
     'Authorization': `token ${token}`,
     'Accept': 'application/json'
   }
@@ -46,6 +46,9 @@ function getAccount(token, callback) {
     if (err) {
       callback(err)
     }
+    else if (res.body.message == 'Bad credentials') {
+      callback(Error(res.body.message))
+    }
     else {
       callback(null, res.body.repos_url)
     }
@@ -57,14 +60,19 @@ function repos(token, callback) {
   let o = cb=>getOrgs(token, cb)
   let i = (repo, cb)=> getRepos(token, repo, cb)
   async.parallel([r, o], (err, repos)=> {
-    async.map(_.flatten(repos), i, (err, unflat)=> {
-      if (err) {
-        callback(err)
-      }
-      else {
-        callback(null, _.flatten(unflat))
-      }
-    })  
+    if (err) {
+      callback(err)
+    }
+    else {
+      async.map(_.flatten(repos), i, (err, unflat)=> {
+        if (err) {
+          callback(err)
+        }
+        else {
+          callback(null, _.flatten(unflat))
+        }
+      })  
+    }
   })
 }
 

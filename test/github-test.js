@@ -1,7 +1,7 @@
 import env from 'node-env-file'
 import path from 'path'
 import test from 'tape'
-import github from '../'
+import github from '../src/index'
 
 // if we're in dev grab env vars from .env
 let mode = process.env.NODE_ENV
@@ -43,7 +43,7 @@ test('get access token with code', t=> {
     t.end()
   }
   else {
-    let code = 'enter a code here but do not commit it'
+    let code = 'put a code here but do not commit it'
     t.plan(1)
     github.token(code, (err, token)=> {
       if (err) {
@@ -74,9 +74,10 @@ test('can get repos', t=> {
   })
 })
 
+
 test('can get issues for repo', t=> {
   t.plan(1)
-  github.issues(process.env.TOKEN, 'checkplease/main', (err, issues)=> {
+  github.issues(process.env.TOKEN, 'smallwins/bugbot', (err, issues)=> {
     if (err) {
       t.fail(err, err)
     }
@@ -88,3 +89,20 @@ test('can get issues for repo', t=> {
   })
 })
 
+test('can open an issue', t=> {
+  let txt = {
+    token: process.env.TOKEN,
+    title: 'test issue',
+    repoID: 'smallwins/bugbot'
+  }
+  github.add(txt, (err, issue)=> {
+    if (err) {
+      t.fail(err, err)
+    }
+    else {
+      t.ok(issue, 'saved and got the issue')
+      console.log(issue)
+    }
+    t.end()
+  })
+})

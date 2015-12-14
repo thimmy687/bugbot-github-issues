@@ -2,6 +2,7 @@ import register from './register'
 import token from './token'
 import repos from './repos'
 import issues from './issues'
+import add from './add'
 
 let describe = `
   github
@@ -10,6 +11,7 @@ let describe = `
     token(code, (err, token)=>)
     repos(token, (err, repos[])=>)
     issues(token, repoID, (err, issues[])=>)
+    add({token, repoID, title}, (err, issues)=>)
 `
 
 export default {
@@ -17,5 +19,6 @@ export default {
   token,
   register,
   repos, 
-  issues
+  issues,
+  add
 }

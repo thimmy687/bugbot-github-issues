@@ -2,11 +2,10 @@
   "name": "bugbot-github-issues",
   "version": "1.2.0",
   "description": "A very simple client for Github Issues",
-  "main": "./dist/index.js",
+  "main": "dist/index",
   "scripts": {
-    "start": "babel src --out-dir dist",
-    "test": "babel-node test/github-test | tap-spec",
-    "prepublish": "npm start"
+    "test": "./scripts/t test/github-test",
+    "prepublish": "babel src --out-dir dist"
   },
   "author": "Brian LeRoux",
   "license": "Apache-2",
