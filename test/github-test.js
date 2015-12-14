@@ -59,6 +59,19 @@ test('get access token with code', t=> {
   }
 })
 
+test('can get the user', t=> {
+  t.plan(1)
+  github.user(process.env.TOKEN, (err, usr)=> {
+    if (err) {
+      t.fail(err, err)
+    }
+    else {
+      t.ok(usr, 'got the user')
+      console.log(usr)
+    }
+    t.end()
+  })
+})
 
 test('can get repos', t=> {
   t.plan(1)
