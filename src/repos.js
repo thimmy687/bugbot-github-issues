@@ -39,41 +39,50 @@ function getRepos(token, uri, callback) {
   })
 }
 
-function getAccount(token, callback) {
-  let uri = 'https://api.github.com/user'
+function getAllOrgRepos(token, callback) {
   let headers = head(token)
-  request.get({uri, headers, json}, (err, res)=> {
-    if (err) {
-      callback(err)
-    }
-    else if (res.body.message == 'Bad credentials') {
-      callback(Error(res.body.message))
-    }
-    else {
-      callback(null, res.body.repos_url)
-    }
-  })
-}
-
-function repos(token, callback) {
-  let r = cb=>getAccount(token, cb)
-  let o = cb=>getOrgs(token, cb)
   let i = (repo, cb)=> getRepos(token, repo, cb)
-  async.parallel([r, o], (err, repos)=> {
-    if (err) {
-      callback(err)
-    }
-    else {
-      async.map(_.flatten(repos), i, (err, unflat)=> {
-        if (err) {
-          callback(err)
-        }
-        else {
-          callback(null, _.flatten(unflat))
-        }
-      })  
-    }
+  getOrgs(token, (err, repos)=> {
+    async.map(repos, i, (err, unflat)=> {
+      callback(err, _.flatten(unflat))
+    })
   })
 }
 
-export default repos
+function getUserRepos(affiliation, token, callback) {
+  let uri = 'https://api.github.com/user/repos'
+  let json = true
+  let qs = {affiliation}
+  // FIXME need to generalize User-Agent
+  let headers = {
+    'User-Agent': 'Bugbot',
+    'Authorization': `token ${token}`,
+    'Accept': 'application/json'
+  }
+  request.get({uri, qs, headers, json}, (err, res)=> {
+    let repos = res.body
+    if (repos.message === 'Bad credentials') {
+      callback(repos.message)
+    }
+    else {
+      callback(err, repos.map(r=>r.full_name))
+    } 
+  })
+}
+
+function getAllUserRepos(token, callback) {
+  let a = cb=> getUserRepos('collaborator', token, cb)
+  let b = cb=> getUserRepos('organization_member', token, cb)
+  let c = cb=> getUserRepos('owner', token, cb)
+  async.parallel([a, b, c], (err, data)=> {
+    callback(err, _.flatten(data))
+  })
+}
+
+export default function repos(token, callback) {
+  let u = cb=> getAllUserRepos(token, cb)
+  let r = cb=> getAllOrgRepos(token, cb)
+  async.parallel([u, r], (err, data)=> {
+    callback(err, _.flatten(data))
+  })
+}
