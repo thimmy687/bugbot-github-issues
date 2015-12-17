@@ -49,10 +49,10 @@ function getAllOrgRepos(token, callback) {
   })
 }
 
-function getUserRepos(affiliation, token, callback) {
+function getUserRepos(affiliation, visibility, token, callback) {
   let uri = 'https://api.github.com/user/repos'
   let json = true
-  let qs = {affiliation}
+  let qs = {affiliation, visibility}
   // FIXME need to generalize User-Agent
   let headers = {
     'User-Agent': 'Bugbot',
@@ -71,10 +71,13 @@ function getUserRepos(affiliation, token, callback) {
 }
 
 function getAllUserRepos(token, callback) {
-  let a = cb=> getUserRepos('collaborator', token, cb)
-  let b = cb=> getUserRepos('organization_member', token, cb)
-  let c = cb=> getUserRepos('owner', token, cb)
-  async.parallel([a, b, c], (err, data)=> {
+  let a = cb=> getUserRepos('collaborator', 'private', token, cb)
+  let b = cb=> getUserRepos('organization_member', 'private', token, cb)
+  let c = cb=> getUserRepos('owner', 'private', token, cb)
+  let a1 = cb=> getUserRepos('collaborator', 'public', token, cb)
+  let b1 = cb=> getUserRepos('organization_member', 'public', token, cb)
+  let c1 = cb=> getUserRepos('owner', 'public', token, cb)
+  async.parallel([a, b, c, a1, b1, c1], (err, data)=> {
     callback(err, _.flatten(data))
   })
 }
@@ -83,6 +86,6 @@ export default function repos(token, callback) {
   let u = cb=> getAllUserRepos(token, cb)
   let r = cb=> getAllOrgRepos(token, cb)
   async.parallel([u, r], (err, data)=> {
-    callback(err, _.flatten(data))
+    callback(err, _.flatten(data).sort())
   })
 }
