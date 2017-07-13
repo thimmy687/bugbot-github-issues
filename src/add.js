@@ -2,7 +2,7 @@ import request from 'request'
 
 export default function add(params, callback) {
   let req = ['token', 'repoID', 'title']
-  let uri = `https://api.github.com/repos/${params.repoID}/issues`
+  let uri = `https://github.com/${params.repoID}/issues`
   let json = true
   let headers = {
     'User-Agent':    'Bugbot', 
